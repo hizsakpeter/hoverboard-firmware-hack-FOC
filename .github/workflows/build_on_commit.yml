@@ -16,3 +16,9 @@ jobs:
       - name: Build Firmware
         run: |
           make
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: hoverboard-firmware
+          path: build/*.bin
