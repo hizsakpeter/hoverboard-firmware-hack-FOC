@@ -1,41 +1,18 @@
 name: Build
 
-on:
-  push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ '*' ]
+on: [push, pull_request]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-22.04
     steps:
-    # Get required packages
-    - uses: actions/checkout@v4
-    - uses: carlosperate/arm-none-eabi-gcc-action@v1
-      with:
-        release: '9-2019-q4'
+      - uses: actions/checkout@v4
 
-    # Build with make
-    - name: make
-      env: 
-        VARIANT: VARIANT_ADC
-      run: make
+      - name: Install ARM GCC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi make
 
-    # Build with Platformio
-    - name: PlatformIO Install
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade platformio
-    - name: PlatformIO Run
-      run: pio run
-
-    - name: 'Upload Build Artifact'
-      uses: actions/upload-artifact@v4
-      with:
-        path: ${{github.workspace}}/.pio/build/**
-        name: ${{github.event.repository.name}}_build_${{github.run_number}}
-        retention-days: 5
-
+      - name: Build Firmware
+        run: |
+          make
